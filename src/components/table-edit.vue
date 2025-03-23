@@ -1,40 +1,30 @@
 <template>
-	<el-form ref="formRef" :model="form" :rules="rules" :label-width="options.labelWidth">
-		<el-row>
-			<el-col :span="options.span" v-for="item in options.list">
-				<el-form-item :label="item.label" :prop="item.prop">
-					<!-- 文本框、数字框、下拉框、日期框、开关、上传 -->
-					<el-input v-if="item.type === 'input'" v-model="form[item.prop]" :disabled="item.disabled"
-						:placeholder="item.placeholder" clearable></el-input>
-					<el-input-number v-else-if="item.type === 'number'" v-model="form[item.prop]"
-						:disabled="item.disabled" controls-position="right"></el-input-number>
-					<el-select v-else-if="item.type === 'select'" v-model="form[item.prop]" :disabled="item.disabled"
-						:placeholder="item.placeholder" clearable>
-						<el-option v-for="opt in item.opts" :label="opt.label" :value="opt.value"></el-option>
-					</el-select>
-					<el-date-picker v-else-if="item.type === 'date'" type="date" v-model="form[item.prop]"
-						:value-format="item.format"></el-date-picker>
-					<el-switch v-else-if="item.type === 'switch'" v-model="form[item.prop]"
-						:active-value="item.activeValue" :inactive-value="item.inactiveValue"
-						:active-text="item.activeText" :inactive-text="item.inactiveText"></el-switch>
-					<el-upload v-else-if="item.type === 'upload'" class="avatar-uploader" action="#"
-						:show-file-list="false" :on-success="handleAvatarSuccess">
-						<img v-if="form[item.prop]" :src="form[item.prop]" class="avatar" />
-						<el-icon v-else class="avatar-uploader-icon">
-							<Plus />
-						</el-icon>
-					</el-upload>
-					<slot :name="item.prop" v-else>
-
-					</slot>
-				</el-form-item>
-			</el-col>
-		</el-row>
-
-		<el-form-item>
-			<el-button type="primary" @click="saveEdit(formRef)">保 存</el-button>
-		</el-form-item>
-	</el-form>
+    <el-form ref="formRef" :model="form" :rules="rules" :label-width="options.labelWidth">
+        <el-row>
+            <el-col :span="options.span" v-for="item in options.list" :key="item.prop">
+                <el-form-item :label="item.label" :prop="item.prop">
+                    <el-input v-if="item.type === 'input'" v-model="form[item.prop]" :disabled="item.disabled" :placeholder="item.placeholder" clearable></el-input>
+                    <!-- 日期选择器渲染逻辑 -->
+                    <el-date-picker 
+                        v-if="item.type === 'date-picker'" 
+                        v-model="form[item.prop]" 
+                        :disabled="item.disabled" 
+                        :placeholder="item.placeholder" 
+                        type="date" 
+                        format="YYYY-MM-DD" 
+                        value-format="YYYY-MM-DD"
+                    ></el-date-picker>
+                    <!-- 其他类型的表单元素渲染逻辑 -->
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-form ref="formRef" :model="form" :rules="rules" :label-width="options.labelWidth">
+        <!-- 表单元素 -->
+        <el-form-item>
+            <el-button type="primary" @click="saveEdit(formRef)">保 存</el-button>
+        </el-form-item>
+    </el-form>
+    </el-form>
 </template>
 
 <script lang="ts" setup>

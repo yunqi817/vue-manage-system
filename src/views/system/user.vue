@@ -40,15 +40,15 @@ const handleSearch = () => {
 // 表格相关
 let columns = ref([
     { type: 'index', label: '序号', width: 55, align: 'center' },
-    { prop: 'staff_id', label: '员工编号' },
-    { prop: 'Staff_name', label: '员工姓名' },
-    { prop: 'Staff_gender', label: '员工性别' },
-    { prop: 'Staff_position', label: '员工职位' },
-    { prop: 'Staff_department', label: '员工部门' },
-    { prop: 'Staff_hiredate', label: '入职日期' },
-    { prop: 'Staff_tel', label: '联系方式' },
-    { prop: 'Staff_permission', label: '员工权限' },
-    { prop: 'Staff_pwd', label: '密码' },
+    { prop: 'staffId', label: '员工编号' },
+    { prop: 'staffName', label: '员工姓名' },
+    { prop: 'staffGender', label: '员工性别' },
+    { prop: 'staffPosition', label: '员工职位' },
+    { prop: 'staffDepartment', label: '员工部门' },
+    { prop: 'staffHiredate', label: '入职日期' },
+    { prop: 'staffTel', label: '联系方式' },
+    { prop: 'staffPermission', label: '员工权限' },
+    { prop: 'staffPwd', label: '密码' },
     { prop: 'remark', label: '备注' },
     { prop: 'operator', label: '操作', width: 250 },
 ]);
@@ -60,8 +60,9 @@ const page = reactive({
 const tableData = ref<User[]>([]);
 const getData = async () => {
     const res = await fetchUserData();
-    console.log(res);
-    tableData.value = res.data.list;
+    // console.log(res);
+    tableData.value = res.data;
+    console.log(res.data);
     page.total = res.data.pageTotal;
 };
 getData();
@@ -76,15 +77,15 @@ let options = ref<FormOption>({
     labelWidth: '100px',
     span: 12,
     list: [
-        { type: 'input', label: '员工编号', prop: 'staff_id', required: true },
-        { type: 'input', label: '员工姓名', prop: 'Staff_name', required: true },
-        { type: 'switch', label: '员工性别', prop: 'Staff_gender', required: true },
-        { type: 'input', label: '员工职位', prop: 'Staff_position', required: true },
-        { type: 'input', label: '员工部门', prop: 'Staff_department', required: true },
-        { type: 'date-picker', label: '入职日期', prop: 'Staff_hiredate', required: true },
-        { type: 'input', label: '联系方式', prop: 'Staff_tel', required: true },
-        { type: 'input', label: '员工权限', prop: 'Staff_permission', required: true },
-        { type: 'input', label: '密码', prop: 'Staff_pwd', required: true },
+            { type: 'input', label: '员工编号', prop: 'staffId', required: true },
+        { type: 'input', label: '员工姓名', prop: 'staffName', required: true },
+        { type: 'input', label: '员工性别', prop: 'staffGender', required: true },
+        { type: 'input', label: '员工职位', prop: 'staffPosition', required: true },
+        { type: 'input', label: '员工部门', prop: 'staffDepartment', required: true },
+        { type: 'date-picker', label: '入职日期', prop: 'staffHireDate', required: true },
+        { type: 'input', label: '联系方式', prop: 'staffTel', required: true },
+        { type: 'input', label: '员工权限', prop: 'staffPermission', required: true },
+        { type: 'input', label: '密码', prop: 'staffPwd', required: true },
         { type: 'input', label: '备注', prop: 'remark', required: false },
     ]
 });
@@ -92,6 +93,7 @@ const visible = ref(false);
 const isEdit = ref(false);
 const rowData = ref({});
 const handleEdit = (row: User) => {
+    console.log('编辑的数据:', row);
     rowData.value = { ...row };
     isEdit.value = true;
     visible.value = true;
