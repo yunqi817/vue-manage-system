@@ -1,22 +1,28 @@
 {
     "list": [
         {
-            "id": 1,
-            "name": "张三",
-            "password": "123",
-            "email": "123@qq.com",
-            "phone": "12345678944",
-            "date": "2024-01-01",
-            "role": "管理员"
+            "staff_id": 1,
+            "Staff_name": "张三",
+            "Staff_gender": true,
+            "Staff_position": "经理",
+            "Staff_department": "技术部",
+            "Staff_hiredate": "2024-01-01",
+            "Staff_tel": "12345678944",
+            "Staff_permission": "高级权限",
+            "Staff_pwd": "123",
+            "remark": "工作认真负责"
         },
         {
-            "id": 2,
-            "name": "李四",
-            "password": "123",
-            "email": "1234@qq.com",
-            "phone": "12345678945",
-            "date": "2024-01-01",
-            "role": "普通用户"
+            "staff_id": 2,
+            "Staff_name": "李四",
+            "Staff_gender": false,
+            "Staff_position": "员工",
+            "Staff_department": "市场部",
+            "Staff_hiredate": "2024-01-02",
+            "Staff_tel": "12345678945",
+            "Staff_permission": "普通权限",
+            "Staff_pwd": "123",
+            "remark": "积极主动"
         }
     ],
     "pageTotal": 2

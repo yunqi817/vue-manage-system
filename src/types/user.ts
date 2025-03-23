@@ -1,16 +1,14 @@
-
+// src/types/user.ts
 export interface User {
-    id: number;
-    name: string;
-    password: string;
-    email: string;
-    phone: string;
-    role: string;
-    date: string;
-}
-
-export interface Register {
-    username: string;
-    password: string;
-    email: string;
+    staffId: number;
+    staffName: string;
+    staffGender: boolean;
+    staffPosition: number;
+    staffDepartment: number;
+    // 注意：JavaScript 没有直接对应的 Date 类型，通常后端返回的日期是字符串格式
+    staffHiredate: string; 
+    staffTel: string;
+    staffPermission: number;
+    staffPwd: string;
+    remark: string;
 }

@@ -9,8 +9,11 @@ export const fetchData = () => {
 
 export const fetchUserData = () => {
     return request({
-        url: './mock/user.json',
+        url: 'http://localhost:8080/user/list',
         method: 'get'
+    }).catch(error => {
+        console.error('获取用户数据失败:', error);
+        throw error;
     });
 };
 

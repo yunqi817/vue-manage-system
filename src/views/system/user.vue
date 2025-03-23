@@ -2,20 +2,16 @@
     <div>
         <TableSearch :query="query" :options="searchOpt" :search="handleSearch" />
         <div class="container">
-            <TableCustom :columns="columns" :tableData="tableData" :total="page.total" :viewFunc="handleView"
+            <TableCustom :columns="columns" :tableData="tableData" :total="page.total" 
                 :delFunc="handleDelete" :page-change="changePage" :editFunc="handleEdit">
                 <template #toolbarBtn>
                     <el-button type="warning" :icon="CirclePlusFilled" @click="visible = true">新增</el-button>
                 </template>
             </TableCustom>
-
         </div>
         <el-dialog :title="isEdit ? '编辑' : '新增'" v-model="visible" width="700px" destroy-on-close
             :close-on-click-modal="false" @close="closeDialog">
             <TableEdit :form-data="rowData" :options="options" :edit="isEdit" :update="updateData" />
-        </el-dialog>
-        <el-dialog title="查看详情" v-model="visible1" width="700px" destroy-on-close>
-            <TableDetail :data="viewData"></TableDetail>
         </el-dialog>
     </div>
 </template>
@@ -27,17 +23,16 @@ import { CirclePlusFilled } from '@element-plus/icons-vue';
 import { User } from '@/types/user';
 import { fetchUserData } from '@/api';
 import TableCustom from '@/components/table-custom.vue';
-import TableDetail from '@/components/table-detail.vue';
-import TableSearch from '@/components/table-search.vue';
+import TableEdit from '@/components/table-edit.vue';
 import { FormOption, FormOptionList } from '@/types/form-option';
 
 // 查询相关
 const query = reactive({
-    name: '',
+    Staff_name: '',
 });
 const searchOpt = ref<FormOptionList[]>([
-    { type: 'input', label: '用户名：', prop: 'name' }
-])
+    { type: 'input', label: '员工姓名：', prop: 'Staff_name' }
+]);
 const handleSearch = () => {
     changePage(1);
 };
@@ -45,19 +40,26 @@ const handleSearch = () => {
 // 表格相关
 let columns = ref([
     { type: 'index', label: '序号', width: 55, align: 'center' },
-    { prop: 'name', label: '用户名' },
-    { prop: 'phone', label: '手机号' },
-    { prop: 'role', label: '角色' },
+    { prop: 'staff_id', label: '员工编号' },
+    { prop: 'Staff_name', label: '员工姓名' },
+    { prop: 'Staff_gender', label: '员工性别' },
+    { prop: 'Staff_position', label: '员工职位' },
+    { prop: 'Staff_department', label: '员工部门' },
+    { prop: 'Staff_hiredate', label: '入职日期' },
+    { prop: 'Staff_tel', label: '联系方式' },
+    { prop: 'Staff_permission', label: '员工权限' },
+    { prop: 'Staff_pwd', label: '密码' },
+    { prop: 'remark', label: '备注' },
     { prop: 'operator', label: '操作', width: 250 },
-])
+]);
 const page = reactive({
     index: 1,
     size: 10,
     total: 0,
-})
+});
 const tableData = ref<User[]>([]);
 const getData = async () => {
-    const res = await fetchUserData()
+    const res = await fetchUserData();
     tableData.value = res.data.list;
     page.total = res.data.pageTotal;
 };
@@ -73,13 +75,18 @@ let options = ref<FormOption>({
     labelWidth: '100px',
     span: 12,
     list: [
-        { type: 'input', label: '用户名', prop: 'name', required: true },
-        { type: 'input', label: '手机号', prop: 'phone', required: true },
-        { type: 'input', label: '密码', prop: 'password', required: true },
-        { type: 'input', label: '邮箱', prop: 'email', required: true },
-        { type: 'input', label: '角色', prop: 'role', required: true },
+        { type: 'input', label: '员工编号', prop: 'staff_id', required: true },
+        { type: 'input', label: '员工姓名', prop: 'Staff_name', required: true },
+        { type: 'switch', label: '员工性别', prop: 'Staff_gender', required: true },
+        { type: 'input', label: '员工职位', prop: 'Staff_position', required: true },
+        { type: 'input', label: '员工部门', prop: 'Staff_department', required: true },
+        { type: 'date-picker', label: '入职日期', prop: 'Staff_hiredate', required: true },
+        { type: 'input', label: '联系方式', prop: 'Staff_tel', required: true },
+        { type: 'input', label: '员工权限', prop: 'Staff_permission', required: true },
+        { type: 'input', label: '密码', prop: 'Staff_pwd', required: true },
+        { type: 'input', label: '备注', prop: 'remark', required: false },
     ]
-})
+});
 const visible = ref(false);
 const isEdit = ref(false);
 const rowData = ref({});
@@ -98,51 +105,10 @@ const closeDialog = () => {
     isEdit.value = false;
 };
 
-// 查看详情弹窗相关
-const visible1 = ref(false);
-const viewData = ref({
-    row: {},
-    list: []
-});
-const handleView = (row: User) => {
-    viewData.value.row = { ...row }
-    viewData.value.list = [
-        {
-            prop: 'id',
-            label: '用户ID',
-        },
-        {
-            prop: 'name',
-            label: '用户名',
-        },
-        {
-            prop: 'password',
-            label: '密码',
-        },
-        {
-            prop: 'email',
-            label: '邮箱',
-        },
-        {
-            prop: 'phone',
-            label: '电话',
-        },
-        {
-            prop: 'role',
-            label: '角色',
-        },
-        {
-            prop: 'date',
-            label: '注册日期',
-        },
-    ]
-    visible1.value = true;
-};
-
 // 删除相关
 const handleDelete = (row: User) => {
     ElMessage.success('删除成功');
-}
+};
 </script>
 
 <style scoped></style>
