@@ -21,7 +21,7 @@ import { ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 import { CirclePlusFilled } from '@element-plus/icons-vue';
 import { User } from '@/types/user';
-import { fetchUserData } from '@/api';
+import { fetchUserData, updateUserData } from '@/api';
 import TableCustom from '@/components/table-custom.vue';
 import TableEdit from '@/components/table-edit.vue';
 import { FormOption, FormOptionList } from '@/types/form-option';
@@ -42,7 +42,7 @@ let columns = ref([
     { type: 'index', label: '序号', width: 55, align: 'center' },
     { prop: 'staffId', label: '员工编号' },
     { prop: 'staffName', label: '员工姓名' },
-    { prop: 'staffGender', label: '员工性别' },
+    { prop: 'staffGender', label: '员工性别'},
     { prop: 'staffPosition', label: '员工职位' },
     { prop: 'staffDepartment', label: '员工部门' },
     { prop: 'staffHiredate', label: '入职日期' },
@@ -60,9 +60,14 @@ const page = reactive({
 const tableData = ref<User[]>([]);
 const getData = async () => {
     const res = await fetchUserData();
-    // console.log(res);
-    tableData.value = res.data;
     console.log(res.data);
+    const dataWithConvertedGender = res.data.map(item => {
+        return {
+            ...item,
+            staffGender: item.staffGender === 1? '男' : '女'
+        };
+    });
+    tableData.value = dataWithConvertedGender;
     page.total = res.data.pageTotal;
 };
 getData();
@@ -77,12 +82,12 @@ let options = ref<FormOption>({
     labelWidth: '100px',
     span: 12,
     list: [
-            { type: 'input', label: '员工编号', prop: 'staffId', required: true },
+        { type: 'input', label: '员工编号', prop: 'staffId', required: true },
         { type: 'input', label: '员工姓名', prop: 'staffName', required: true },
         { type: 'input', label: '员工性别', prop: 'staffGender', required: true },
         { type: 'input', label: '员工职位', prop: 'staffPosition', required: true },
         { type: 'input', label: '员工部门', prop: 'staffDepartment', required: true },
-        { type: 'date-picker', label: '入职日期', prop: 'staffHireDate', required: true },
+        { type: 'date-picker', label: '入职日期', prop: 'staffHiredate', required: true },
         { type: 'input', label: '联系方式', prop: 'staffTel', required: true },
         { type: 'input', label: '员工权限', prop: 'staffPermission', required: true },
         { type: 'input', label: '密码', prop: 'staffPwd', required: true },
@@ -98,9 +103,15 @@ const handleEdit = (row: User) => {
     isEdit.value = true;
     visible.value = true;
 };
-const updateData = () => {
-    closeDialog();
-    getData();
+const updateData = async () => {
+    try {
+        await updateUserData(rowData.value);
+        ElMessage.success('更新用户数据成功');
+        closeDialog();
+        getData();
+    } catch (error) {
+        ElMessage.error('更新用户数据失败');
+    }
 };
 
 const closeDialog = () => {
