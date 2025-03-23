@@ -9,7 +9,7 @@ export const fetchData = () => {
 
 export const fetchUserData = () => {
     return request({
-        url: 'http://localhost:8080/user/list',
+        url: '/api/user/list',
         method: 'get'
     }).catch(error => {
         console.error('获取用户数据失败:', error);
