@@ -3,7 +3,7 @@
         <div class="login-container">
             <div class="login-header">
                 <img class="logo mr10" src="../../assets/img/logo.svg" alt="" />
-                <div class="login-title">后台管理系统</div>
+                <div class="login-title">铁路转线管理系统</div>
             </div>
             <el-form :model="param" :rules="rules" ref="login" size="large">
                 <el-form-item prop="username">
@@ -50,6 +50,7 @@ import { usePermissStore } from '@/store/permiss';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
+import { getUserInfo } from '@/api';
 
 interface LoginInfo {
     username: string;
@@ -63,7 +64,7 @@ const checked = ref(lgStr ? true : false);
 const router = useRouter();
 const param = reactive<LoginInfo>({
     username: defParam ? defParam.username : '',
-    password: defParam ? defParam.password : '',
+    password: defParam ? defParam.password : ''
 });
 
 const rules: FormRules = {
@@ -71,29 +72,52 @@ const rules: FormRules = {
         {
             required: true,
             message: '请输入用户名',
-            trigger: 'blur',
-        },
+            trigger: 'blur'
+        }
     ],
-    password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+    password: [
+        {
+            required: true,
+            message: '请输入密码',
+            trigger: 'blur'
+        }
+    ]
 };
 const permiss = usePermissStore();
 const login = ref<FormInstance>();
-const submitForm = (formEl: FormInstance | undefined) => {
+
+const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    formEl.validate((valid: boolean) => {
+    formEl.validate(async (valid: boolean) => {
         if (valid) {
-            ElMessage.success('登录成功');
-            localStorage.setItem('vuems_name', param.username);
-            const keys = permiss.defaultList[param.username == 'admin' ? 'admin' : 'user'];
-            permiss.handleSet(keys);
-            router.push('/');
-            if (checked.value) {
-                localStorage.setItem('login-param', JSON.stringify(param));
-            } else {
-                localStorage.removeItem('login-param');
+            try {
+                // 调用 getUserInfo 方法获取用户信息
+                const response = await getUserInfo(param.username);
+                const user = response.data;
+                console.log("11111111111",user);
+
+                // 检查用户信息是否存在以及密码是否匹配
+                if (user && user.staffPwd === param.password) {
+                    ElMessage.success('登录成功');
+                    localStorage.setItem('vuems_name', param.username);
+                    // 这里不再区分管理员，可根据需要设置默认权限
+                    const defaultKeys = permiss.defaultList['user']; 
+                    permiss.handleSet(defaultKeys);
+                    // 登录成功后跳转到主页
+                    router.push('/dashboard'); 
+                    if (checked.value) {
+                        localStorage.setItem('login-param', JSON.stringify(param));
+                    } else {
+                        localStorage.removeItem('login-param');
+                    }
+                } else {
+                    ElMessage.error('用户名或密码错误');
+                }
+            } catch (error) {
+                ElMessage.error('获取用户信息失败，请稍后重试');
             }
         } else {
-            ElMessage.error('登录失败');
+            ElMessage.error('登录失败，请检查输入');
             return false;
         }
     });

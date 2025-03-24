@@ -9,13 +9,11 @@
                 <div class="user-info">
                     <div class="info-name">{{ name }}</div>
                     <div class="info-desc">
-                        <span>@lin-xin</span>
+                        <span>@rensizheng</span>
                         <el-divider direction="vertical" />
-                        <el-link href="https://lin-xin.gitee.io" target="_blank">lin-xin.gitee.io</el-link>
                     </div>
-                    <div class="info-desc">FE Developer</div>
                     <div class="info-icon">
-                        <a href="https://github.com/lin-xin" target="_blank"> <i class="el-icon-lx-github-fill"></i></a>
+                        <a href="https://github.com/yunqi817/vue-manage-system.git" target="_blank"> <i class="el-icon-lx-github-fill"></i></a>
                         <i class="el-icon-lx-qq-fill"></i>
                         <i class="el-icon-lx-facebook-fill"></i>
                         <i class="el-icon-lx-twitter-fill"></i>
@@ -75,21 +73,6 @@
                                 <el-button type="primary" @click="onSubmit">保存</el-button>
                             </el-form-item>
                         </el-form>
-                    </el-tab-pane>
-                    <el-tab-pane name="label4" label="赞赏作者" class="user-tabpane">
-                        <div class="plugins-tips">
-                            如果该框架
-                            <el-link href="https://github.com/lin-xin/vue-manage-system" target="_blank"
-                                >vue-manage-system</el-link
-                            >
-                            对你有帮助，那就请作者喝杯饮料吧！<el-icon>
-                                <ColdDrink />
-                            </el-icon>
-                            加微信号 linxin_20 探讨问题。
-                        </div>
-                        <div>
-                            <img src="https://lin-xin.gitee.io/images/weixin.jpg" />
-                        </div>
                     </el-tab-pane>
                 </el-tabs>
             </el-card>

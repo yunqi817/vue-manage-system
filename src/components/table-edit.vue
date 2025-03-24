@@ -1,5 +1,6 @@
 <template>
     <el-form ref="formRef" :model="form" :rules="rules" :label-width="options.labelWidth">
+        <!-- 表单输入项 -->
         <el-row>
             <el-col :span="options.span" v-for="item in options.list" :key="item.prop">
                 <el-form-item :label="item.label" :prop="item.prop">
@@ -22,8 +23,8 @@
     </el-form>
 </template>
 
-<script lang="ts" setup>
-import { FormInstance, FormRules, UploadProps } from 'element-plus';
+<script setup lang="ts">
+import { FormInstance, FormRules } from 'element-plus';
 import { PropType, ref } from 'vue';
 import { FormOption } from '@/types/form-option';
 
@@ -46,7 +47,7 @@ const { options, formData, edit, update } = defineProps({
     }
 });
 
-const form = ref({ ...(edit ? formData : {}) });
+const form = ref({ ...formData });
 
 const rules: FormRules = options.list.map(item => {
     if (item.required) {
@@ -58,15 +59,19 @@ const rules: FormRules = options.list.map(item => {
 const formRef = ref<FormInstance>();
 const saveEdit = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    formEl.validate(valid => {
-        if (!valid) return false;
-        update(form.value);
+    formEl.validate((valid) => {
+        if (valid) {
+            // 将修改后的数据更新到 formData
+            Object.assign(formData, form.value);
+            // 调用父组件的 update 方法
+            update();
+        } else {
+            console.log('表单验证失败');
+        }
     });
 };
 
-const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-    form.value.thumb = URL.createObjectURL(uploadFile.raw!);
-};
+
 </script>
 
 <style>
