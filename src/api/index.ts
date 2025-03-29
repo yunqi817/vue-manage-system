@@ -1,11 +1,6 @@
 import request from '../utils/request';
 
-export const fetchData = () => {
-    return request({
-        url: './mock/table.json',
-        method: 'get'
-    });
-};
+
 
 export const fetchUserData = () => {
     return request({
@@ -53,7 +48,17 @@ export const getUserInfo = (staffId: string) => {
         url: `/api/user/${staffId}`,
         method: 'get'
     }).catch(error => {
-        console.error('获取用户信息失败:', error);
+        console.error('没有该用户:', error);
+        throw error;
+    });
+};
+
+export const DeleteUserInfo = (staffId: string) => {
+    return request({
+        url: `/api/user/${staffId}`,
+        method: 'delete'
+    }).catch(error => {
+        console.error('没有该用户:', error);
         throw error;
     });
 };
