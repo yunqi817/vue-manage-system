@@ -31,7 +31,6 @@ export const fetchRoleData = () => {
 
 // 新增更新用户数据的 API 请求函数
 export const updateUserData = (data: any) => {
-    console.log('updateUserData', data);
     return request({
         url: '/api/user/update',
         method: 'post', 
@@ -53,6 +52,7 @@ export const getUserInfo = (staffId: string) => {
     });
 };
 
+//根据id删除用户
 export const DeleteUserInfo = (staffId: string) => {
     return request({
         url: `/api/user/${staffId}`,
@@ -63,6 +63,7 @@ export const DeleteUserInfo = (staffId: string) => {
     });
 };
 
+//添加用户
 export const ADDUserData = (data: any) => {
     return request({
         url: '/api/user/addUser',
@@ -70,6 +71,29 @@ export const ADDUserData = (data: any) => {
         data
     }).catch(error => {
         console.error('添加用户数据失败:', error);
+        throw error;
+    });
+};
+
+//修改车辆信息
+export const updateCarOpreateData = (data: any) => {
+    return request({
+        url: '/api/car/updateCar',
+        method: 'post', 
+        data
+    }).catch(error => {
+        console.error('更新车辆信息数据失败:', error);
+        throw error;
+    });
+};
+
+export const saveCarOpreate = (data: any) => {
+    return request({
+        url: '/api/car/saveCarOpreate',
+        method: 'post', 
+        data
+    }).catch(error => {
+        console.error('更新车辆信息数据失败:', error);
         throw error;
     });
 };

@@ -4,6 +4,7 @@
             <div class="table-toolbar-left">
                 <slot name="toolbarBtn"></slot>
             </div>
+            
             <div class="table-toolbar-right flex-center">
                 <template v-if="multipleSelection.length > 0">
                     <el-tooltip effect="dark" content="删除选中" placement="top">
@@ -35,6 +36,9 @@
                 </el-tooltip>
             </div>
         </div>
+        <div class="table-toolbar-left">
+                <slot name="info"></slot>
+            </div>
         <el-table class="mgb20" :style="{ width: '100%' }" border :data="tableData" :row-key="rowKey"
             @selection-change="handleSelectionChange" table-layout="auto">
             <template v-for="item in columns" :key="item.prop">
@@ -46,6 +50,7 @@
                     </template>
                     <template #default="{ row, column, $index }" v-if="!item.type">
                         <slot :name="item.prop" :rows="row" :index="$index">
+                        
                             <template v-if="item.prop == 'operator'">
                                 <el-button type="primary" size="small" :icon="Edit" @click="editFunc(row)">
                                     编辑
@@ -57,6 +62,23 @@
                             <span v-else-if="item.formatter">
                                 {{ item.formatter(row[item.prop]) }}
                             </span>
+                            <template v-else-if="item.prop == 'opreate'">
+                                <template v-for="opreate in row.opreate" :key="opreate.opration">➫
+                                    <el-button 
+                                    style="margin-left: 5px;margin-right: 5px;" 
+                                    :type="opreate.isOk?'success':'danger'" 
+                                    size="small" 
+                                    @click="handleOpreate({row,opreate,})">
+                                        {{ opreate.opration }}
+                                    </el-button>
+                                    
+                                </template>
+                               <!-- {{row.opreate?row.opreate.map((item2,index2)=>{
+                                return '->'+item2.opration
+}
+):'' }} -->
+
+                            </template>
                             <span v-else>
                                 {{ row[item.prop] }}
                             </span>
@@ -138,7 +160,11 @@ const props = defineProps({
     changePage: {
         type: Function,
         default: () => { }
-    }
+    },
+    opreateFunc: {
+        type: Function,
+        default: () => { }
+    },
 })
 
 let {
@@ -176,6 +202,15 @@ const handleDelete = (row) => {
     })
         .then(async () => {
             props.delFunc(row);
+        })
+        .catch(() => { });
+};
+const handleOpreate = (data) => {
+    ElMessageBox.confirm('确定完成'+data.opreate.opration+'操作吗？', '提示', {
+        type: 'warning'
+    })
+        .then(async () => {
+            props.opreateFunc(data);
         })
         .catch(() => { });
 };
