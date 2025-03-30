@@ -6,7 +6,7 @@
             <TableCustom :columns="columns" :tableData="tableData" :total="page.total" 
                 :delFunc="handleDelete" :page-change="changePage" :editFunc="handleEdit">
                 <template #toolbarBtn>
-                    <el-button type="warning" :icon="CirclePlusFilled" @click="visible = true">新增</el-button>
+                    <el-button type="warning" :icon="CirclePlusFilled" @click="handleAdd">新增</el-button>
                 </template>
             </TableCustom>
         </div>
@@ -22,10 +22,12 @@ import { ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 import { CirclePlusFilled } from '@element-plus/icons-vue';
 import { User } from '@/types/user';
-import { fetchUserData, getUserInfo, updateUserData } from '@/api';
+import { fetchUserData, getUserInfo, updateUserData, ADDUserData } from '@/api';
 import TableCustom from '@/components/table-custom.vue';
 import TableEdit from '@/components/table-edit.vue';
 import { FormOption, FormOptionList } from '@/types/form-option';
+import { DeleteUserInfo } from '@/api';
+import { ElMessageBox } from 'element-plus';
 
 // 查询相关
 const query = reactive({
@@ -122,7 +124,7 @@ let options = ref<FormOption>({
     labelWidth: '100px',
     span: 12,
     list: [
-        { type: 'input', label: '员工编号', prop: 'staffId', required: true, disabled: true },
+        { type: 'input', label: '员工编号', prop: 'staffId', required:false , disabled: true },
         { type: 'input', label: '员工姓名', prop: 'staffName', required: false },
         { type: 'input', label: '员工性别', prop: 'staffGender', required: false },
         { type: 'input', label: '员工职位', prop: 'staffPosition', required: false },
@@ -142,14 +144,31 @@ const handleEdit = (row: User) => {
     isEdit.value = true;
     visible.value = true;
 };
+
+// 新增按钮点击事件处理函数
+const handleAdd = () => {
+    rowData.value = {}; // 清空 rowData
+    isEdit.value = false;
+    visible.value = true;
+};
+
 const updateData = async () => {
     try {
-        await updateUserData(rowData.value);
-        ElMessage.success('更新用户数据成功');
+        if (isEdit.value) {
+            await updateUserData(rowData.value);
+            ElMessage.success('更新用户数据成功');
+        } else {
+            await ADDUserData(rowData.value);
+            ElMessage.success('新增用户数据成功');
+        }
         closeDialog();
         getData();
     } catch (error) {
-        ElMessage.error('更新用户数据失败');
+        if (isEdit.value) {
+            ElMessage.error('更新用户数据失败');
+        } else {
+            ElMessage.error('新增用户数据失败');
+        }
     }
 };
 
@@ -159,8 +178,32 @@ const closeDialog = () => {
 };
 
 // 删除相关
-const handleDelete = (row: User) => {
-    ElMessage.success('删除成功');
+const handleDelete = async (row: User) => {
+    try {
+        // 显示确认对话框
+        await ElMessageBox.confirm(
+            '确认要删除该用户吗？',
+            '删除提示',
+            {
+                confirmButtonText: '删除',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }
+        );
+
+        // 调用删除 API        
+        const staffId = String(row.staffId);
+        await DeleteUserInfo(staffId);
+        ElMessage.success('用户删除成功');
+        
+        // 重新获取数据
+        await getData();
+    } catch (error) {
+        if (error !== 'cancel') { // 过滤用户取消操作
+            ElMessage.error('用户删除失败');
+            console.error('删除失败:', error);
+        }
+    }
 };
 </script>
 

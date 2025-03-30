@@ -62,3 +62,14 @@ export const DeleteUserInfo = (staffId: string) => {
         throw error;
     });
 };
+
+export const ADDUserData = (data: any) => {
+    return request({
+        url: '/api/user/addUser',
+        method: 'post', 
+        data
+    }).catch(error => {
+        console.error('添加用户数据失败:', error);
+        throw error;
+    });
+};

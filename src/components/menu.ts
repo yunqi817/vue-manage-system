@@ -19,12 +19,12 @@ export const menuData: Menus[] = [
                 index: '/system-user',
                 title: '用户管理',
             },
-            {
-                id: '12',
-                pid: '1',
-                index: '/system-role',
-                title: '角色管理',
-            },
+            // {
+            //     id: '12',
+            //     pid: '1',
+            //     index: '/system-role',
+            //     title: '角色管理',
+            // },
             {
                 id: '13',
                 pid: '1',
