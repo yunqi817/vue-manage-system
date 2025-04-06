@@ -164,6 +164,10 @@ const props = defineProps({
     opreateFunc: {
         type: Function,
         default: () => { }
+    }, 
+    opreateFunc1: {
+        type: Function,
+        default: () => { }
     },
 })
 
@@ -206,6 +210,7 @@ const handleDelete = (row) => {
         .catch(() => { });
 };
 const handleOpreate = (data) => {
+    if(data.opreate && data.opreate.isOk == 0){
     ElMessageBox.confirm('确定完成'+data.opreate.opration+'操作吗？', '提示', {
         type: 'warning'
     })
@@ -213,6 +218,15 @@ const handleOpreate = (data) => {
             props.opreateFunc(data);
         })
         .catch(() => { });
+    }else if(data.opreate && data.opreate.isOk == 1){
+        ElMessageBox.confirm('确定要取消'+data.opreate.opration+'操作吗？', '提示', {
+            type: 'warning'
+        })
+            .then(async () => {
+                props.opreateFunc1(data);
+            })
+            .catch(() => { });
+}
 };
 
 const getIndex = (index: number) => {

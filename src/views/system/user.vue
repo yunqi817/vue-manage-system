@@ -180,16 +180,6 @@ const closeDialog = () => {
 // 删除相关
 const handleDelete = async (row: User) => {
     try {
-        // 显示确认对话框
-        await ElMessageBox.confirm(
-            '确认要删除该用户吗？',
-            '删除提示',
-            {
-                confirmButtonText: '删除',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }
-        );
 
         // 调用删除 API        
         const staffId = String(row.staffId);

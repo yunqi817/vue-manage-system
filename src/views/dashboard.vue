@@ -2,11 +2,11 @@
     <div>
         <TableSearch :query="query" :options="searchOpt" :search="handleSearch" />
         <div class="container">
-            <TableCustom :columns="columns" :tableData="tableData" :total="page.total" :page-change="changePage"
-                :editFunc="handleEdit" :opreateFunc="opreateFunc">
+            <TableCustom :columns="columns" :delFunc="handleDelete" :tableData="tableData" :total="page.total" :page-change="changePage"
+                :editFunc="handleEdit" :opreateFunc="opreateFunc" :opreateFunc1="opreateFunc1">
                 <template #toolbarBtn>
                     <!-- 添加表头并设置居中样式 -->
-                    <el-button type="warning" :icon="CirclePlusFilled" @click="visible = true">新增</el-button>
+                    <!-- <el-button type="warning" :icon="CirclePlusFilled" @click="visible = true">新增</el-button> -->
                 </template>
                 <template #info>
                     <div style="">
@@ -23,8 +23,8 @@
                                 <text class="underline">{{ 
                                 tableData && tableData[0] && tableData[0].地区 ?
                                     tableData[0].地区
-                                    : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-                                }}</text>杭州动车所转线作业计划
+                                    : '杭州'
+                                }}</text>动车所转线作业计划
                             </el-col>
                             <el-col :span="12" style="text-align: right;">
                                 编制人:
@@ -66,7 +66,7 @@
                             <el-col :span="12" style="text-align: right;">
                                 <!-- 2024年7月9日至2024年7月10日 -->
                                 <text class="underline">
-                                    {{ tableData && tableData[0] && tableData[0] ? tableData[0].planT :
+                                    {{ tableData && tableData[0] && tableData[0] ? tableData[0].planTime  :
                                         '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
                                     }}
                                 </text>
@@ -92,6 +92,7 @@ import { fetchCarData, updateCarOpreateData } from "@/api"; // 引入获取车�
 import TableCustom from "@/components/table-custom.vue";
 import TableEdit from "@/components/table-edit.vue";
 import { FormOption, FormOptionList } from "@/types/form-option";
+import { DeleteCarInfo } from "@/api";
 
 // 查询相关
 const query = reactive({
@@ -131,7 +132,13 @@ const tableData = ref([]);
 const getData = async () => {
     try {
         const res = await fetchCarData();
-        console.log("获取车辆数据成功:", res.data);
+        // console.log("获取车辆数据成功:", res.data);
+        // res.data.forEach((item: any) => {
+        //     if(item.arrTime){
+        //     item.arrTime.replace(/T/, " ");
+        //     console.info("111111111111111111111111",item.arrTime);
+        // }
+        // });
         // 不再对 opreate 数组进行拼接操作
         tableData.value = res.data;
         page.total = res.data.pageTotal;
@@ -155,13 +162,13 @@ let options = ref<FormOption>({
         { type: "input", label: "车次", prop: "carId", required: false },
         { type: "input", label: "车型号", prop: "carNo", required: false },
         { type: "input", label: "辆数", prop: "carNum", required: false },
-        { type: "input", label: "到达时间", prop: "arrTime", required: false },
+        { type: "date-picker", label: "到达时间", prop: "arrTime", required: false },
         { type: "input", label: "方向", prop: "direction", required: false },
         { type: "input", label: "到达股道", prop: "arrTrack", required: false },
         { type: "input", label: "出发股道", prop: "outTrack", required: false },
         { type: "input", label: "备开车次", prop: "backupId", required: false },
         { type: "input", label: "线别", prop: "line", required: false },
-        { type: "input", label: "出发时间", prop: "outTime", required: false },
+        { type: "date-picker", label: "出发时间", prop: "outTime", required: false },
         { type: "input", label: "序号", prop: "ornum", required: false },
         { type: "input", label: "备注", prop: "remark2", required: false },
     ],
@@ -176,8 +183,9 @@ const handleEdit = (row) => {
     visible.value = true;
 };
 
+//updateCarData && updateData修改车的信息
 const updateCarData = async (data) => {
-    console.log("更新车辆信息数据:", data);
+    // console.log("更新车辆信息数据:", data);
     try {
         const response = await updateCarOpreateData(data);
         return response;
@@ -197,6 +205,8 @@ const updateData = async () => {
         ElMessage.error("更新数据失败");
     }
 };
+
+//opreateFunc确认 && opreateFunc1取消
 const opreateFunc = async (data) => {
     try {
         data.opreate.isOk = 1
@@ -211,9 +221,43 @@ const opreateFunc = async (data) => {
         ElMessage.error("更新数据失败");
     }
 };
+const opreateFunc1 = async (data) => {
+    try {
+        data.opreate.isOk = 0
+        data.row.opreate = [data.opreate]
+        console.log("更新车辆信息数据:", data.row);
+        await updateCarOpreateData(data.row);
+        // saveCarOpreate
+        ElMessage.success("更新数据成功");
+        closeDialog();
+        getData();
+    } catch (error) {
+        ElMessage.error("更新数据失败");
+    }
+};
 
 const closeDialog = () => {
     visible.value = false;
+};
+
+
+// 删除相关
+const handleDelete = async (row) => {
+    try {
+
+        // 调用删除 API        
+        const Id = String(row.id);
+        await DeleteCarInfo(Id);
+        ElMessage.success('删除成功');
+        
+        // 重新获取数据
+        await getData();
+    } catch (error) {
+        if (error !== 'cancel') { // 过滤用户取消操作
+            ElMessage.error('删除失败');
+            console.error('删除失败:', error);
+        }
+    }
 };
 </script>
 

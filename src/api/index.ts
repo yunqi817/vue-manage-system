@@ -97,3 +97,14 @@ export const saveCarOpreate = (data: any) => {
         throw error;
     });
 };
+
+//根据id删除车系信息以及对应操作信息
+export const DeleteCarInfo = (Id: string) => {
+    return request({
+        url: `/api/car/${Id}`,
+        method: 'delete'
+    }).catch(error => {
+        console.error('没有该用户:', error);
+        throw error;
+    });
+};
