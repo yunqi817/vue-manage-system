@@ -108,3 +108,16 @@ export const DeleteCarInfo = (Id: string) => {
         throw error;
     });
 };
+
+
+
+export const importExcel = (data: any ) =>{
+    return request({
+        url: `/api/car/importExcel`,
+        method: 'post',
+        data
+    }).catch(error => {
+        console.error('请重新上传，并检查格式:', error);
+        throw error;
+    });
+};

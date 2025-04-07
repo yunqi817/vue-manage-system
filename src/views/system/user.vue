@@ -100,6 +100,7 @@ const tableData = ref<User[]>([]);
 const getData = async () => {
     try {
         const res = await fetchUserData();
+        const count = 0;
         const dataWithConvertedGender = res.data.map(item => {
             return {
                 ...item,
@@ -107,7 +108,8 @@ const getData = async () => {
             };
         });
         tableData.value = dataWithConvertedGender;
-        page.total = res.data.pageTotal;
+        page.total = res.data.length;
+        // console.log("111111111111222222222",res.data.length)
     } catch (error) {
         ElMessage.error('获取用户数据失败');
     }

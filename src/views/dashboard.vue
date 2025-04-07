@@ -6,7 +6,11 @@
                 :editFunc="handleEdit" :opreateFunc="opreateFunc" :opreateFunc1="opreateFunc1">
                 <template #toolbarBtn>
                     <!-- 添加表头并设置居中样式 -->
-                    <!-- <el-button type="warning" :icon="CirclePlusFilled" @click="visible = true">新增</el-button> -->
+                    <!-- <el-button type="warning" :icon="CirclePlusFilled" @click="visible = true">导入</el-button> -->
+                    <el-upload action="#" :limit="1" accept=".xlsx, .xls" :show-file-list="false"
+                   :http-request="handleUpload">
+            <el-button type="warning" :icon="CirclePlusFilled">导入</el-button>
+        </el-upload>
                 </template>
                 <template #info>
                     <div style="">
@@ -92,7 +96,7 @@ import { fetchCarData, updateCarOpreateData } from "@/api"; // 引入获取车�
 import TableCustom from "@/components/table-custom.vue";
 import TableEdit from "@/components/table-edit.vue";
 import { FormOption, FormOptionList } from "@/types/form-option";
-import { DeleteCarInfo } from "@/api";
+import { DeleteCarInfo, importExcel  } from "@/api";
 
 // 查询相关
 const query = reactive({
@@ -141,7 +145,7 @@ const getData = async () => {
         // });
         // 不再对 opreate 数组进行拼接操作
         tableData.value = res.data;
-        page.total = res.data.pageTotal;
+        page.total = res.data.length;
     } catch (error) {
         console.error("获取车辆数据失败:", error);
         ElMessage.error("获取车辆数据失败");
@@ -257,6 +261,17 @@ const handleDelete = async (row) => {
             ElMessage.error('删除失败');
             console.error('删除失败:', error);
         }
+    }
+};
+
+
+const handleUpload = async (params: any) => {
+    try {
+        const response = await importExcel(params.file); // 调用后端接口方法并传递 FormData
+        console.log('导入成功', response);
+        // 可以在这里添加导入成功后的操作，比如刷新表格数据等
+    } catch (error) {
+        console.error('导入失败', error);
     }
 };
 </script>
