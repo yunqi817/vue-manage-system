@@ -96,7 +96,7 @@ import { fetchCarData, updateCarOpreateData } from "@/api"; // 引入获取车�
 import TableCustom from "@/components/table-custom.vue";
 import TableEdit from "@/components/table-edit.vue";
 import { FormOption, FormOptionList } from "@/types/form-option";
-import { DeleteCarInfo, importExcel  } from "@/api";
+import { DeleteCarInfo, importExcel, getCarInfo} from "@/api";
 
 // 查询相关
 const query = reactive({
@@ -105,8 +105,20 @@ const query = reactive({
 const searchOpt = ref<FormOptionList[]>([
     { type: "input", label: "车次：", prop: "trainNumber" },
 ]);
-const handleSearch = () => {
-    changePage(1);
+const handleSearch = async () => {
+    try {
+        let res;
+        console.log("111111",query.trainNumber);
+        if (query.trainNumber) {
+            res = await getCarInfo(query.trainNumber);
+        } else {
+            res = await fetchCarData();
+        }
+        tableData.value = res.data;
+        page.total = res.data.length;
+    } catch (error) {
+        ElMessage.error('信息获取失败');
+    }
 };
 
 // 表格相关

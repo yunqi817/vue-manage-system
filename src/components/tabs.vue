@@ -21,7 +21,7 @@
                     <el-dropdown-menu size="small">
                         <el-dropdown-item command="other">关闭其他</el-dropdown-item>
                         <el-dropdown-item command="current">关闭当前</el-dropdown-item>
-                        <el-dropdown-item command="all">关闭所有</el-dropdown-item>
+                        <el-dropdown-item command="all">关闭所有</el-dropdown-item>                    
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -38,6 +38,7 @@ const route = useRoute();
 const router = useRouter();
 const activePath = ref(route.fullPath);
 const tabs = useTabsStore();
+
 // 设置标签
 const setTags = (route: any) => {
     const isExist = tabs.list.some((item) => {
@@ -59,7 +60,7 @@ onBeforeRouteUpdate((to) => {
 // 关闭全部标签
 const closeAll = () => {
     tabs.clearTabs();
-    router.push('/');
+    router.push('/dashboard');
 };
 // 关闭其他标签
 const closeOther = () => {
@@ -67,6 +68,10 @@ const closeOther = () => {
         return item.path === route.fullPath;
     });
     tabs.closeTabsOther(curItem);
+    // 检查是否没有标签页了，如果没有则跳转到主页
+    if (tabs.list.length === 0) {
+        router.push('/dashboard');
+    }
 };
 const handleTags = (command: string) => {
     switch (command) {
@@ -76,11 +81,14 @@ const handleTags = (command: string) => {
                 $router: router,
                 $route: route,
             });
+            // 检查是否没有标签页了，如果没有则跳转到主页
+            if (tabs.list.length === 0) {
+                router.push('/dashboard');
+            }
             break;
         case 'all':
             closeAll();
             break;
-
         case 'other':
             closeOther();
             break;
@@ -95,6 +103,10 @@ const closeTabs = (path: string) => {
     tabs.delTabsItem(index);
     const item = tabs.list[index] || tabs.list[index - 1];
     router.push(item ? item.path : '/');
+    // 检查是否没有标签页了，如果没有则跳转到主页
+    if (tabs.list.length === 0) {
+        router.push('/');
+    }
 };
 
 watch(
@@ -145,4 +157,4 @@ watch(
     box-shadow: -3px 0 15px 3px rgba(0, 0, 0, 0.1);
     z-index: 10;
 }
-</style>
+</style>    

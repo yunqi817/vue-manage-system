@@ -34,25 +34,20 @@ const query = reactive({
     Staff_name: '',
 });
 const searchOpt = ref<FormOptionList[]>([
-    { type: 'input', label: '员工姓名：', prop: 'Staff_name' }
+    { type: 'input', label: '员工编号：', prop: 'Staff_name' }
 ]);
 
 // 处理搜索的方法
 const handleSearch = async () => {
     try {
-        // 调用获取用户数据的 API，并传入查询参数
         let res;
-        // 区分搜索条件：员工编号或姓名
         if (query.Staff_name) {
-            // 调用根据员工编号搜索单个用户的 API（假设接口设计如此）
             res = await getUserInfo(query.Staff_name);
         } else {
-            // 获取所有用户数据
             res = await fetchUserData();
         }
         console.log("22222222222", res.data);
         let dataWithConvertedGender;
-        // 检查 res.data 是否为数组
         if (Array.isArray(res.data)) {
             dataWithConvertedGender = res.data.map(item => {
                 return {
@@ -61,14 +56,12 @@ const handleSearch = async () => {
                 };
             });
         } else {
-            // 如果 res.data 是单个对象，将其转换为数组
             dataWithConvertedGender = [{
                 ...res.data,
                 staffGender: res.data.staffGender === 1? '男' : '女'
             }];
         }
         tableData.value = dataWithConvertedGender;
-        // 由于返回数据可能没有 pageTotal 属性，这里简单设置为 1
         page.total = dataWithConvertedGender.length;
     } catch (error) {
         console.error('搜索用户数据时出错:', error);

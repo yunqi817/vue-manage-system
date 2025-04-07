@@ -34,7 +34,7 @@
                     <el-link type="primary" @click="$router.push('/reset-pwd')">忘记密码</el-link>
                 </div>
                 <el-button class="login-btn" type="primary" size="large" @click="submitForm(login)">登录</el-button>
-                <p class="login-tips">Tips : 用户名和密码随便填。</p>
+                <!-- <p class="login-tips">Tips : 用户名和密码随便填。</p> -->
                 <p class="login-text">
                     没有账号？<el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
                 </p>
@@ -94,7 +94,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                 // 调用 getUserInfo 方法获取用户信息
                 const response = await getUserInfo(param.username);
                 const user = response.data;
-                console.log("11111111111",user);
+                // console.log("11111111111",user);
 
                 // 检查用户信息是否存在以及密码是否匹配
                 if (user && user.staffPwd === param.password) {

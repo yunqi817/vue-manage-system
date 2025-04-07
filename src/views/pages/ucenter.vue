@@ -86,14 +86,52 @@ import { VueCropper } from 'vue-cropper';
 import 'vue-cropper/dist/index.css';
 import avatar from '@/assets/img/img.jpg';
 import TabsComp from '../element/tabs.vue';
+import { ElMessage, ElMessageBox } from "element-plus";
+import {sendExampleRequest} from '@/api'
+import { useRouter } from 'vue-router';
 
 const name = localStorage.getItem('vuems_name');
+const router = useRouter();
 const form = reactive({
     new1: '',
     new: '',
     old: '',
 });
-const onSubmit = () => {};
+const onSubmit =  async () => {
+    if (!form.old || !form.new || !form.new1) {
+        ElMessage.error('旧密码、新密码和确认新密码均为必填项');
+        return;
+    }
+    if (form.new === form.new1) {
+        try {
+            // 假设从本地存储中获取用户ID
+            const userId = Number(localStorage.getItem('vuems_name')); 
+            console.log("yonghmming",userId);
+            const response = await sendExampleRequest(userId, form.old, form.new);
+            // 假设后端返回的字符串在 response.data 中
+            if (typeof response.data === 'string' && response.data.includes('旧密码错误')) {
+                ElMessage.error(response.data);
+            } else {
+                ElMessageBox.alert('更新密码成功，请重新登录', '提示', {
+                    confirmButtonText: '确定',
+                    showClose: false, // 取消右上角的叉号
+                    callback: () => {
+                        router.push('/login'); // 点击确定直接跳转登录页
+                    },
+                });
+            
+            }
+        } catch (error) {
+            console.error('修改密码出错:', error);
+            ElMessage.error('修改密码失败，请稍后重试');
+        }
+    } else {
+        ElMessage.error('两次密码不一致');
+        form.old = '';
+        form.new = '';
+        form.new1 = '';
+    }
+};
 
 const activeName = ref('label1');
 
