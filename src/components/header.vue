@@ -62,7 +62,7 @@ import { useSidebarStore } from '../store/sidebar';
 import { useRouter } from 'vue-router';
 import imgurl from '../assets/img/img.jpg';
 
-const username: string | null = localStorage.getItem('vuems_name');
+const username: string | null = localStorage.getItem('vuems_id');
 const message: number = 2;
 
 const sidebar = useSidebarStore();

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="container">
-            <TableCustom :columns="columns" :tableData="menuData" row-key="index" :has-pagination="false"
+            <TableCustom :columns="columns" :tableData="filteredMenuData" row-key="index" :has-pagination="false"
                 :viewFunc="handleView" :delFunc="handleDelete" :editFunc="handleEdit">
                 <template #toolbarBtn>
                     <el-button type="warning" :icon="CirclePlusFilled" @click="visible = true">新增</el-button>
@@ -44,6 +44,7 @@ import TableCustom from '@/components/table-custom.vue';
 import TableDetail from '@/components/table-detail.vue';
 import { FormOption } from '@/types/form-option';
 import { menuData } from '@/components/menu';
+import { getFilteredMenuData } from '@/components/menu';
 
 // 表格相关
 let columns = ref([
@@ -54,6 +55,8 @@ let columns = ref([
     { prop: 'operator', label: '操作', width: 250 },
 ])
 
+const filteredMenuData = ref(getFilteredMenuData());
+console.log('调用 getFilteredMenuData 后获取的菜单数据', filteredMenuData.value);
 const getOptions = (data: any) => {
     return data.map(item => {
         const a: any = {

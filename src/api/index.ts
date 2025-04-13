@@ -14,16 +14,38 @@ export const fetchUserData = () => {
     });
 };
 
-export const fetchCarData = () => {
+export const fetchCarData = (date : String) => {
     return request({
         url: '/api/car/list',
-        method: 'get'
+        method: 'post',
+        params:{
+            date
+        }
     }).catch(error => {
         console.error('获取转线数据失败:', error);
         throw error;
     });
 };
 
+export const fetchLogData = () => {
+    return request({
+        url: '/api/opreateLog/list',
+        method: 'get'
+    }).catch(error => {
+        console.error('获取日志数据失败:', error);
+        throw error;
+    });
+};
+
+export const fetchjobData = () => {
+    return request({
+        url: '/api/jobperson/list',
+        method: 'get'
+    }).catch(error => {
+        console.error('获取值班数据失败:', error);
+        throw error;
+    });
+};
 
 //更新接口        
     
@@ -68,6 +90,17 @@ export const updateCarOpreateData = (data: any) => {
     });
 };
 
+export const updateJobData = (data: any) => {
+    return request({
+        url: '/api/jobperson/updatejob',
+        method: 'post', 
+        data
+    }).catch(error => {
+        console.error('更新值班数据失败:', error);
+        throw error;
+    });
+};
+
 
 //搜索接口
 
@@ -95,6 +128,32 @@ export const getCarInfo = (carId: string) => {
     });
 };
 
+export const getLogbyid = (date: string) => {
+    return request({
+        url: `/api/opreateLog/searchLog/${date}`,
+        method: 'post',
+        params: {
+            date
+        }
+    }).catch(error => {
+        console.error('查询错误:', error);
+        throw error;
+    });
+};
+
+export const getjobbydate = (date: string) => {
+    return request({
+        url: `/api/jobperson/searchJob`,
+        method: 'post',
+        params: {
+            date
+        }
+    }).catch(error => {
+        console.error('查询错误:', error);
+        throw error;
+    });
+};
+
 
 //删除接口
 
@@ -102,6 +161,16 @@ export const getCarInfo = (carId: string) => {
 export const DeleteCarInfo = (Id: string) => {
     return request({
         url: `/api/car/${Id}`,
+        method: 'delete'
+    }).catch(error => {
+        console.error('没有该用户:', error);
+        throw error;
+    });
+};
+
+export const DeleteLogInfo = (Id: string) => {
+    return request({
+        url: `/api/opreateLog/${Id}`,
         method: 'delete'
     }).catch(error => {
         console.error('没有该用户:', error);
@@ -117,6 +186,16 @@ export const DeleteUserInfo = (staffId: string) => {
         method: 'delete'
     }).catch(error => {
         console.error('没有该用户:', error);
+        throw error;
+    });
+};
+export const DeleteJobInfo = (data: any) => {
+    return request({
+        url: `/api/jobperson/delete`,
+        method: 'post',
+        data
+    }).catch(error => {
+        console.error('没有信息:', error);
         throw error;
     });
 };
@@ -150,13 +229,41 @@ export const saveCarOpreate = (data: any) => {
     });
 };
 
+export const savelog = (data: any) => {
+    return request({
+        url: '/api/opreateLog/saveLog',
+        method: 'post', 
+        data
+    }).catch(error => {
+        console.error('保存日志数据失败:', error);
+        throw error;
+    });
+};
+
+export const saveJob = (data: any) => {
+    return request({
+        url: '/api/jobperson/savejob',
+        method: 'post', 
+        data
+    }).catch(error => {
+        console.error('保存日志数据失败:', error);
+        throw error;
+    });
+};
+
+
 
 //导入接口
-export const importExcel = (data: any ) =>{
+export const importExcel = (file: File ) =>{
+    const formData = new FormData();
+    formData.append('file', file);
     return request({
         url: `/api/car/importExcel`,
         method: 'post',
-        data
+        data: formData,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     }).catch(error => {
         console.error('请重新上传，并检查格式:', error);
         throw error;

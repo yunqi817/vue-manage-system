@@ -100,6 +100,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                 if (user && user.staffPwd === param.password) {
                     ElMessage.success('登录成功');
                     localStorage.setItem('vuems_name', param.username);
+                    localStorage.setItem('vuems_id', user.staffName);
+                    console.log("user",localStorage.getItem('vuems_id'));
                     // 这里不再区分管理员，可根据需要设置默认权限
                     const defaultKeys = permiss.defaultList['user']; 
                     permiss.handleSet(defaultKeys);

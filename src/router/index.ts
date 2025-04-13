@@ -34,22 +34,22 @@ const routes: RouteRecordRaw[] = [
                 component: () => import(/* webpackChunkName: "system-user" */ '../views/system/user.vue')
             },
             {
-                path: '/system-role',
-                name: 'system-role',
+                path: '/system-log',
+                name: 'system-log',
                 meta: {
                     title: '角色管理',
                     permiss: '12'
                 },
-                component: () => import(/* webpackChunkName: "system-role" */ '../views/system/role.vue')
+                component: () => import(/* webpackChunkName: "system-role" */ '../views/system/log.vue')
             },
             {
-                path: '/system-menu',
-                name: 'system-menu',
+                path: '/system-job',
+                name: 'system-job',
                 meta: {
-                    title: '菜单管理',
+                    title: '值班管理',
                     permiss: '13'
                 },
-                component: () => import(/* webpackChunkName: "system-menu" */ '../views/system/menu.vue')
+                component: () => import(/* webpackChunkName: "system-menu" */ '../views/system/jobPerson.vue')
             },
             {
                 path: '/table',

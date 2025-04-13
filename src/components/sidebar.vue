@@ -8,7 +8,7 @@
             :text-color="sidebar.textColor"
             router
         >
-            <template v-for="item in menuData">
+            <template v-for="item in FilteredMenuData">
                 <template v-if="item.children">
                     <el-sub-menu :index="item.index" :key="item.index" v-permiss="item.id">
                         <template #title>
@@ -57,7 +57,10 @@ import { computed } from 'vue';
 import { useSidebarStore } from '../store/sidebar';
 import { useRoute } from 'vue-router';
 import { menuData } from '@/components/menu';
+import { getFilteredMenuData } from '@/components/menu';
+import { ref } from 'vue';
 
+const FilteredMenuData = ref(getFilteredMenuData());
 const route = useRoute();
 const onRoutes = computed(() => {
     return route.path;

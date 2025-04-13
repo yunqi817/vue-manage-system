@@ -66,8 +66,8 @@
                                 <template v-for="opreate in row.opreate" :key="opreate.opration">➫
                                     <el-button 
                                     style="margin-left: 5px;margin-right: 5px;" 
-                                    :type="opreate.isOk?'success':'danger'" 
-                                    size="small" 
+                                    :type="opreate.isOk === 0 ? 'danger' : opreate.isOk === 1 ? 'success' : opreate.isOk === 2 ? 'primary' : opreate.isOk === 3 ? 'warning' : 'info'" 
+                                    size="small"
                                     @click="handleOpreate({row,opreate,})">
                                         {{ opreate.opration }}
                                     </el-button>
@@ -218,7 +218,7 @@ const handleOpreate = (data) => {
             props.opreateFunc(data);
         })
         .catch(() => { });
-    }else if(data.opreate && data.opreate.isOk == 1){
+    }else if(data.opreate || data.opreate.isOk == 1 ||data.opreate.isOk == 2 ||data.opreate.isOk == 3){
         ElMessageBox.confirm('确定要取消'+data.opreate.opration+'操作吗？', '提示', {
             type: 'warning'
         })

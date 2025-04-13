@@ -19,17 +19,17 @@ export const menuData: Menus[] = [
                 index: '/system-user',
                 title: '用户管理',
             },
-            // {
-            //     id: '12',
-            //     pid: '1',
-            //     index: '/system-role',
-            //     title: '角色管理',
-            // },
+            {
+                id: '12',
+                pid: '1',
+                index: '/system-log',
+                title: '日志管理',
+            },
             {
                 id: '13',
                 pid: '1',
-                index: '/system-menu',
-                title: '菜单管理',
+                index: '/system-job',
+                title: '值班管理',
             },
         ],
     },
@@ -219,3 +219,14 @@ export const menuData: Menus[] = [
         ],
     },
 ];
+
+export const getFilteredMenuData = () => {
+    const username = localStorage.getItem('vuems_id');
+    
+    console.log('当前获取的用户名是:', username);
+    if (username === 'admin') {
+        return menuData;
+    }
+    console.log('getFilteredMenuData',menuData);
+    return menuData.filter(menu => menu.title !== '系统管理');
+};
