@@ -3,9 +3,23 @@ import { Menus } from '@/types/menu';
 export const menuData: Menus[] = [
     {
         id: '0',
-        title: '系统首页',
-        index: '/dashboard',
+        title: '日常操作',
+        index: '',
         icon: 'Odometer',
+        children: [
+            {
+                id: '11',
+                pid: '111',
+                index: '/dashboard',
+                title: '动车转线管理',
+            },
+            {
+                id: '11',
+                pid: '111',
+                index: '/system-importPic',
+                title: '转线计划图片导入',
+            },
+        ]
     },
     {
         id: '1',

@@ -2,17 +2,26 @@
     <div>
         <TableSearch :query="query" :options="searchOpt" :search="handleSearch" />
         <div class="container">
-            <TableCustom :columns="columns" :delFunc="handleDelete" :tableData="tableData" :total="page.total" :page-change="changePage"
-                :editFunc="handleEdit" :opreateFunc="opreateFunc" :opreateFunc1="opreateFunc1">
+            <TableCustom :columns="columns" 
+            :delFunc="handleDelete" 
+            :tableData="paginatedTableData"  
+            :page-size="page.size"
+            :has-pagination="true" 
+            :changePage="changePage" 
+            :total="page.total" 
+            :page-change="changePage"
+            :editFunc="handleEdit" 
+            :opreateFunc="opreateFunc" 
+            :opreateFunc1="opreateFunc1">
                 <template #toolbarBtn>
                     <!-- 添加表头并设置居中样式 -->
-                    <el-upload action="#" :limit="1" accept=".xlsx, .xls" :show-file-list="false"
+                    <el-upload action="#"  accept=".xlsx, .xls" :show-file-list="false"
                    :http-request="handleUpload">
            
-            <el-button class="import" type="warning" :icon="CirclePlusFilled">导入</el-button>
+                        <el-button class="import" type="warning" :icon="CirclePlusFilled">导入</el-button>
             
                     </el-upload>
-                </template>
+                </template> 
                 <template #info>
                     <div style="">
                         <el-date-picker  v-model="selectedDate" type="date" placeholder="选择日期" @change="onDateChange"  value-format="YYYY-MM-DD"></el-date-picker>
@@ -83,11 +92,25 @@
             :close-on-click-modal="false" @close="closeDialog">
             <TableEdit :form-data="rowData" :options="options" :edit="isEdit" :update="updateData" />
         </el-dialog>
+        <el-dialog v-model="previewVisible" title="导入预览" width="80%" @close="closePreview">
+            <div>
+                <el-table :data="previewData" border style="width: 100%">
+                    <el-table-column v-for="(column, index) in previewColumns" :key="index" :prop="column.prop" :label="column.label" />
+                </el-table>
+            </div>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="closePreview">取消</el-button>
+                    <el-button type="primary" @click="confirmImport">确认导入</el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
+        
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, computed} from "vue";
 import { ElMessage } from "element-plus";
 import { CirclePlusFilled } from "@element-plus/icons-vue";
 import { fetchCarData, updateCarOpreateData,savelog } from "@/api"; // 引入获取车辆数据和更新车辆信息的方法
@@ -95,8 +118,9 @@ import TableCustom from "@/components/table-custom.vue";
 import TableEdit from "@/components/table-edit.vue";
 import { FormOption, FormOptionList } from "@/types/form-option";
 import { DeleteCarInfo, importExcel, getCarInfo,getjobbydate} from "@/api";
-import * as XLSX from 'xlsx';
-import VueOfficeExcel from 'vue-office';
+import * as XLSX from "xlsx";
+
+
 
 // 查询相关
 const query = reactive({
@@ -124,6 +148,8 @@ const handleSearch = async () => {
 // 新增：存储选择的日期
 const selectedDate = ref();
 const onDateChange = (date) => {
+    selectedDate.value = date;
+    console.log("选择的日期:", date);
   // 调用 handleDateChange 函数
   handleDateChange(date);
   // 调用 getjob 函数
@@ -168,15 +194,16 @@ const page = reactive({
 const tableData = ref([]);
 const tableData1 = ref([]);
 
+//获取值班信息
 const getjobData = async (date) => {
     try {
         if (date === null) {
             date = "2025-03-25";
         }
-        console.log("选择的日期:", date);
+        // console.log("选择的日期:", date);
         const res = await getjobbydate(date); 
          tableData1.value = res.data; 
-         console.log("222",res.data)
+        //  console.log("222",res.data)
     } catch (error) {
         console.error("获取数据失败:", error);
         ElMessage.error("获取数据失败"); 
@@ -196,9 +223,15 @@ const getData = async () => {
 };
 getData();
 
+const paginatedTableData = computed(() => {
+    console.log("paginatedTableData",tableData.value.length)
+    const start = (page.index - 1) * page.size;
+    const end = start + page.size;
+    return tableData.value.slice(start, end);
+});
 const changePage = (val: number) => {
+    console.log("changePage",val)
     page.index = val;
-    getData();
 };
 
 // 新增/编辑弹窗相关
@@ -218,21 +251,79 @@ let options = ref<FormOption>({
         { type: "date-picker", label: "出发时间", prop: "outTime", required: false },
         { type: "input", label: "序号", prop: "ornum", required: false },
         { type: "input", label: "备注", prop: "remark2", required: false },
+        { type: "input", label: "操作", prop: "opreateList", required: false },
+
     ],
 });
+
+interface RowData {
+    id: number;
+    carId: string;
+    carNo: string;
+    carNum: string;
+    arrTime: string;
+    direction: string;
+    arrTrack: string;
+    outTrack: string;
+    backupId: string;
+    line: string;
+    outTime: string;
+    ornum: string;
+    midPerson: string;
+    nightPerson: string;
+    dayPerson: string;
+    compiler: string;
+    carDoperson: string;
+    planTime: string;
+    remark2: string;
+    opreateList: string;
+    opreate: Array<{
+        opId: number;
+        opration: string;
+        parentId: number;
+        opNo: number;
+        id: number;
+        isOk: number;
+    }>;
+}
 const visible = ref(false);
 const isEdit = ref(false);
-const rowData = ref({});
+const rowData = ref<RowData>({
+    id: 0,
+    carId: "",
+    carNo: "",
+    carNum: "",
+    arrTime: "",
+    direction: "",
+    arrTrack: "",
+    outTrack: "",
+    backupId: "",
+    line: "",
+    outTime: "",
+    ornum: "",
+    midPerson: "",
+    nightPerson: "",
+    dayPerson: "",
+    compiler: "",
+    carDoperson: "",
+    planTime: "",
+    remark2: "",
+    opreateList: "",
+    opreate: [],
+});
 const handleEdit = (row) => {
     console.log("编辑的数据:", row);
     rowData.value = { ...row };
+    const operations = rowData.value.opreate.map(op => op.opration);
+    const result = operations.join(',');
+    rowData.value.opreateList = result;
     isEdit.value = true;
     visible.value = true;
 };
 
 //updateCarData && updateData修改车的信息
 const updateCarData = async (data) => {
-    // console.log("更新车辆信息数据:", data);
+    console.log("更新车辆信息数据:", data);
     try {
         const response = await updateCarOpreateData(data);
         return response;
@@ -334,7 +425,7 @@ const opreateFunc1 = async (data) => {
                     operationLog.value.opreation = data.opreate.opration
                     operationLog.value.planTime = data.row.planTime
                     operationLog.value.opreateTime = new Date()
-                    operationLog.value.isOk = "非班次人员尝试取消取消"
+                    operationLog.value.isOk = "非班次人员尝试取消操作"
                     await savelog(operationLog.value)
                 ElMessage.error('您不是该班次的操作人员，无法修改！');
                 }
@@ -354,13 +445,36 @@ const closeDialog = () => {
 const handleDelete = async (row) => {
     try {
 
-        // 调用删除 API        
-        const Id = String(row.id);
-        await DeleteCarInfo(Id);
-        ElMessage.success('删除成功');
-        
-        // 重新获取数据
-        await getData();
+        if(tableData1.value[0].midPerson === localStorage.getItem('vuems_id') ||
+        tableData1.value[0].dayPerson === localStorage.getItem('vuems_id') ||
+        tableData1.value[0].nightPerson === localStorage.getItem('vuems_id') ||
+            localStorage.getItem('vuems_id') === "admin")
+            {
+                    operationLog.value.carId = row.carId
+                    operationLog.value.opreatePerson = localStorage.getItem('vuems_id')
+                    operationLog.value.opreation = "删除该信息"
+                    operationLog.value.planTime = row.planTime
+                    operationLog.value.opreateTime = new Date()
+                    operationLog.value.isOk = "删除操作"
+                    await savelog(operationLog.value)
+                     // 调用删除 API        
+                    const Id = String(row.id);
+                    await DeleteCarInfo(Id);
+                    ElMessage.success('删除成功');
+                    
+                    // 重新获取数据
+                    await getData();
+            }else{
+                    operationLog.value.carId = row.carId
+                    operationLog.value.opreatePerson = localStorage.getItem('vuems_id')
+                    operationLog.value.opreation = "删除该信息"
+                    operationLog.value.planTime = row.planTime
+                    operationLog.value.opreateTime = new Date()
+                    operationLog.value.isOk = "非班次人员尝试删除操作"                    
+                    await savelog(operationLog.value)
+                ElMessage.error('您不是该班次的操作人员，无法修改！');
+                }
+       
     } catch (error) {
         if (error !== 'cancel') { // 过滤用户取消操作
             ElMessage.error('删除失败');
@@ -370,18 +484,87 @@ const handleDelete = async (row) => {
 };
 
 
+const previewVisible = ref(false);
+const previewData = ref([]);
+const previewColumns = ref([]);
+const previewFile = ref<File | null>(null); // 保存文件对象
+
 const handleUpload = async (params: { file: File }) => {
+    console.log("【handleUpload】开始处理上传文件");
+    const file = params.file;
+    previewFile.value = file;
+    previewData.value = [];
+    previewColumns.value = [];
+
+    const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+        try {
+            const data = e.target?.result;
+            if (!data) throw new Error("文件读取失败");
+
+            const workbook = XLSX.read(data, { type: "array" });
+            if (!workbook.SheetNames.length) throw new Error("无有效工作表");
+
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const headerData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[];
+            const headers = headerData[0] || []; // 处理表头为空的情况
+            const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
+
+            previewData.value = jsonData;
+            previewColumns.value = headers.map((header: string) => ({
+                prop: header,
+                label: header,
+            }));
+            previewVisible.value = true; // 关键：强制显示对话框
+        } catch (error) {
+            console.error("预览错误：", error);
+            ElMessage.error("预览失败，请检查文件格式（仅支持.xlsx/.xls）");
+            previewVisible.value = false; // 错误时关闭对话框
+        }
+    };
+    fileReader.readAsArrayBuffer(file);
+};
+const closePreview = () => {
+    previewVisible.value = false;
+    previewData.value = []; // 清空预览数据
+    previewColumns.value = []; // 清空预览列
+    previewFile.value = null; // 清空文件对象
+};
+
+const confirmImport = async () => {
+    const plandate = '2024-04-17';
+    console.log("date",selectedDate.value)
     try {
-        const response = await importExcel(params.file); 
-        ElMessage.success('导入成功');
-        // 调用后端接口方法并传递 FormData
-        console.log('导入成功', response);
-        // 可以在这里添加导入成功后的操作，比如刷新表格数据等
+        if (previewFile.value) {
+            // 调用接口上传文件
+            if(typeof(selectedDate.value) === "string"){
+                const response = await importExcel(previewFile.value,selectedDate.value);
+            }else{
+                const response = await importExcel(previewFile.value,plandate);
+            }
+            ElMessage.success("导入成功");
+            closePreview(); // 关闭预览对话框并清空状态变量
+            getData(); // 刷新表格数据
+        } else {
+            ElMessage.error("没有文件可以导入");
+        }
     } catch (error) {
-        ElMessage.success('导入成功');
-        console.error('导入失败', error);
+        ElMessage.error("导入失败");
     }
 };
+
+// const handleUpload = async (params: { file: File }) => {
+//     try {
+//         const response = await importExcel(params.file); 
+//         ElMessage.success('导入成功');
+//         // 调用后端接口方法并传递 FormData
+//         console.log('导入成功', response);
+//         // 可以在这里添加导入成功后的操作，比如刷新表格数据等
+//     } catch (error) {
+//         ElMessage.success('导入成功');
+//         console.error('导入失败', error);
+//     }
+// };
 </script>
 
 <style scoped>

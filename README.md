@@ -1,80 +1,115 @@
 # vue-manage-system
 
-  <a href="https://github.com/lin-xin/vue-manage-system/releases">
-    <img src="https://img.shields.io/github/release/lin-xin/vue-manage-system.svg" alt="GitHub release">
-  </a>
-   <a href="https://github.com/lin-xin/vue-manage-system/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license">
-  </a>
-
-基于 Vue3 + pinia + Element Plus 的后台管理系统解决方案。[线上演示](https://lin-xin.github.io/example/vue-manage-system/)
-
-> Vue2 版本请看 [tag-V4.2.0](https://github.com/lin-xin/vue-manage-system/tree/V4.2.0)，带后台功能请看 [tsrpc-manage-system](https://github.com/lin-xin/tsrpc-manage-system)
-
-[文档地址](https://lin-xin.github.io/example/vuems-doc/)
-[English document](https://github.com/lin-xin/manage-system/blob/master/README_EN.md)
-
-## 赞助商
-
-### 好问
-
-[<img src="https://static.bestqa.net/logo/bestqa_haowen.png" width="220" height="100">](https://www.bestqa.net/home/index.html)
-
-专业问卷服务，一对一客服，按需定制
-
-## 支持作者
-
-请作者喝杯咖啡吧！(微信号：linxin_20)
-
-![微信扫一扫](https://lin-xin.github.io/images/weixin.jpg)
-
-## 前言
-
-该方案作为一套多功能的后台框架模板，适用于绝大部分的后台管理系统开发。基于 Vue3 + pinia + typescript，引用 Element Plus 组件库，方便开发。实现逻辑简单，适合外包项目，快速交付。
-
-## 功能
-
--   [x] Element Plus
--   [x] vite 3
--   [x] pinia
--   [x] typescript
--   [x] 登录/注册
--   [x] Dashboard
--   [x] 表格/表单
--   [x] 图表 :bar_chart:
--   [x] 富文本/markdown 编辑器
--   [x] 图片拖拽/裁剪上传
--   [x] 权限管理
--   [x] 三级菜单
--   [x] 自定义图标
--   [x] 主题切换
-
-## 安装步骤
-
-> 因为使用 vite3，node 版本需要 14.18+
 
 ```
-git clone https://github.com/lin-xin/vue-manage-system.git      // 把模板下载到本地
-cd vue-manage-system    // 进入模板目录
-npm install         // 安装项目依赖，等待安装完成之后，安装失败可用 cnpm 或 yarn
-
-// 运行
-npm run dev
-
-// 执行构建命令，生成的dist文件夹放在服务器下即可访问
-npm run build
+vue-manage-system
+├─ 📁.github
+│  └─ 📄FUNDING.yml
+├─ 📁public
+│  ├─ 📁mock
+│  │  ├─ 📄role.json
+│  │  ├─ 📄table.json
+│  │  └─ 📄user.json
+│  └─ 📄template.xlsx
+├─ 📁screenshots
+│  ├─ 📄wms1.png
+│  ├─ 📄wms3.png
+│  └─ 📄zhuye.jpg
+├─ 📁src
+│  ├─ 📁api
+│  │  └─ 📄index.ts
+│  ├─ 📁assets
+│  │  ├─ 📁css
+│  │  │  ├─ 📄icon.css
+│  │  │  └─ 📄main.css
+│  │  └─ 📁img
+│  │     ├─ 📄img.jpg
+│  │     ├─ 📄login-bg.jpg
+│  │     ├─ 📄logo.svg
+│  │     └─ 📄ucenter-bg.jpg
+│  ├─ 📁components
+│  │  ├─ 📄countup.vue
+│  │  ├─ 📄header.vue
+│  │  ├─ 📄menu.ts
+│  │  ├─ 📄sidebar.vue
+│  │  ├─ 📄table-custom.vue
+│  │  ├─ 📄table-detail.vue
+│  │  ├─ 📄table-edit.vue
+│  │  ├─ 📄table-search.vue
+│  │  └─ 📄tabs.vue
+│  ├─ 📁router
+│  │  └─ 📄index.ts
+│  ├─ 📁store
+│  │  ├─ 📄permiss.ts
+│  │  ├─ 📄sidebar.ts
+│  │  ├─ 📄tabs.ts
+│  │  └─ 📄theme.ts
+│  ├─ 📁types
+│  │  ├─ 📄form-option.ts
+│  │  ├─ 📄menu.ts
+│  │  ├─ 📄role.ts
+│  │  ├─ 📄table.ts
+│  │  └─ 📄user.ts
+│  ├─ 📁utils
+│  │  ├─ 📄china.ts
+│  │  ├─ 📄index.ts
+│  │  └─ 📄request.ts
+│  ├─ 📁views
+│  │  ├─ 📁chart
+│  │  │  ├─ 📄echarts.vue
+│  │  │  ├─ 📄options.ts
+│  │  │  └─ 📄schart.vue
+│  │  ├─ 📁element
+│  │  │  ├─ 📄calendar.vue
+│  │  │  ├─ 📄carousel.vue
+│  │  │  ├─ 📄form.vue
+│  │  │  ├─ 📄pagination.vue
+│  │  │  ├─ 📄statistic.vue
+│  │  │  ├─ 📄steps.vue
+│  │  │  ├─ 📄tabs.vue
+│  │  │  ├─ 📄tour.vue
+│  │  │  ├─ 📄upload.vue
+│  │  │  └─ 📄watermark.vue
+│  │  ├─ 📁pages
+│  │  │  ├─ 📄403.vue
+│  │  │  ├─ 📄404.vue
+│  │  │  ├─ 📄editor.vue
+│  │  │  ├─ 📄icon.vue
+│  │  │  ├─ 📄login.vue
+│  │  │  ├─ 📄markdown.vue
+│  │  │  ├─ 📄register.vue
+│  │  │  ├─ 📄reset-pwd.vue
+│  │  │  ├─ 📄theme.vue
+│  │  │  └─ 📄ucenter.vue
+│  │  ├─ 📁system
+│  │  │  ├─ 📄importPic.vue
+│  │  │  ├─ 📄jobPerson.vue
+│  │  │  ├─ 📄log.vue
+│  │  │  ├─ 📄menu.vue
+│  │  │  ├─ 📄role-permission.vue
+│  │  │  └─ 📄user.vue
+│  │  ├─ 📁table
+│  │  │  ├─ 📄basetable.vue
+│  │  │  ├─ 📄export.vue
+│  │  │  ├─ 📄import.vue
+│  │  │  └─ 📄table-editor.vue
+│  │  ├─ 📄dashboard.vue
+│  │  ├─ 📄home.vue
+│  │  └─ 📄OperationStatus.vue
+│  ├─ 📄App.vue
+│  ├─ 📄main.ts
+│  └─ 📄vite-env.d.ts
+├─ 📄.gitignore
+├─ 📄auto-imports.d.ts
+├─ 📄components.d.ts
+├─ 📄index.html
+├─ 📄LICENSE
+├─ 📄package-lock.json
+├─ 📄package.json
+├─ 📄README.md
+├─ 📄README_EN.md
+├─ 📄tsconfig.json
+├─ 📄tsconfig.node.json
+├─ 📄vite.config.ts
+└─ 📄yarn.lock
 ```
-
-## 项目截图
-
-### 首页
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms1.png)
-
-### 登录
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms3.png)
-
-## License
-
-[MIT](https://github.com/lin-xin/vue-manage-system/blob/master/LICENSE)

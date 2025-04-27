@@ -120,14 +120,14 @@ let options = ref<FormOption>({
     span: 12,
     list: [
         { type: 'input', label: '员工编号', prop: 'staffId', required:false , disabled: true },
-        { type: 'input', label: '员工姓名', prop: 'staffName', required: false },
+        { type: 'input', label: '员工姓名', prop: 'staffName', required: true },
         { type: 'input', label: '员工性别', prop: 'staffGender', required: false },
-        { type: 'input', label: '员工职位', prop: 'staffPosition', required: false },
-        { type: 'input', label: '员工部门', prop: 'staffDepartment', required: false },
-        { type: 'date-picker', label: '入职日期', prop: 'staffHiredate', required: false },
-        { type: 'input', label: '联系方式', prop: 'staffTel', required: false },
-        { type: 'input', label: '员工权限', prop: 'staffPermission', required: false },
-        { type: 'input', label: '密码', prop: 'staffPwd', required: false },
+        { type: 'input', label: '员工职位', prop: 'staffPosition', required: true },
+        { type: 'input', label: '员工部门', prop: 'staffDepartment', required: true },
+        { type: 'date-picker', label: '入职日期', prop: 'staffHiredate', required: true },
+        { type: 'input', label: '联系方式', prop: 'staffTel', required: true },
+        { type: 'input', label: '员工权限', prop: 'staffPermission', required: true },
+        { type: 'input', label: '密码', prop: 'staffPwd', required: true },
         { type: 'input', label: '备注', prop: 'remark', required: false },
     ]
 });

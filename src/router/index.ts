@@ -19,10 +19,19 @@ const routes: RouteRecordRaw[] = [
                 path: '/dashboard',
                 name: 'dashboard',
                 meta: {
-                    title: '系统首页',
+                    title: '动车转线管理',
                     noAuth: true
                 },
                 component: () => import(/* webpackChunkName: "dashboard" */ '../views/dashboard.vue')
+            },
+             {
+                path: '/system-importPic',
+                name: 'system-importPic',
+                meta: {
+                    title: '转线计划图片导入',
+                    noAuth: true
+                },
+                component: () => import(/* webpackChunkName: "system-importPic" */ '../views/system/importPic.vue')
             },
             {
                 path: '/system-user',
@@ -40,7 +49,7 @@ const routes: RouteRecordRaw[] = [
                     title: '角色管理',
                     permiss: '12'
                 },
-                component: () => import(/* webpackChunkName: "system-role" */ '../views/system/log.vue')
+                component: () => import(/* webpackChunkName: "system" */ '../views/system/log.vue')
             },
             {
                 path: '/system-job',

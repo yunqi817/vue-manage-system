@@ -47,6 +47,16 @@ export const fetchjobData = () => {
     });
 };
 
+export const fetchimportData = () => {
+    return request({
+        url: '/api/file/list',
+        method: 'get'
+    }).catch(error => {
+        console.error('获取值班数据失败:', error);
+        throw error;
+    });
+};
+
 //更新接口        
     
     // 更新用户数据
@@ -200,6 +210,19 @@ export const DeleteJobInfo = (data: any) => {
     });
 };
 
+export const DeletePicExcelInfo = (fileName: string) => {
+    return request({
+        url: `/api/file/delete`,
+        method: 'post',
+        params: {
+            fileName
+        }
+    }).catch(error => {
+        console.error('没有信息:', error);
+        throw error;
+    });
+};
+
 
 
 //新增接口
@@ -254,9 +277,10 @@ export const saveJob = (data: any) => {
 
 
 //导入接口
-export const importExcel = (file: File ) =>{
+export const importExcel = (file: File,plandate: string ) =>{
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('plandate', plandate);
     return request({
         url: `/api/car/importExcel`,
         method: 'post',
@@ -269,3 +293,20 @@ export const importExcel = (file: File ) =>{
         throw error;
     });
 };
+
+
+export const recognize = (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return request({
+        url: `/api/file/upload`,
+        method: 'post',
+        data: formData,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }).catch(error => {
+        console.error('请重新上传，并检查格式:', error);
+        throw error;
+    });
+};  

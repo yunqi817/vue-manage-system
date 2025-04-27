@@ -3,8 +3,17 @@
         <!-- 使用 TableSearch 组件进行搜索 -->
         <TableSearch :query="query" :options="searchOpt" :search="handleSearch" />
         <div class="container">
-            <TableCustom :columns="columns" :tableData="tableData" :total="page.total" 
-                :delFunc="handleDelete" :page-change="changePage" :editFunc="handleEdit">
+            <TableCustom 
+                :columns="columns" 
+                :tableData="paginatedTableData" 
+                :total="page.total" 
+                :has-pagination="true" 
+                :current-page="page.index" 
+                :page-size="page.size" 
+                :changePage="changePage" 
+                :delFunc="handleDelete" 
+                :editFunc="handleEdit"
+            >
                 <template #toolbarBtn>
                     <!-- <el-button type="warning" :icon="CirclePlusFilled" @click="handleAdd">新增</el-button> -->
                 </template>
@@ -18,7 +27,7 @@
 </template>
 
 <script setup lang="ts" name="system-user">
-import { ref, reactive } from 'vue';
+import { ref, reactive,computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { CirclePlusFilled } from '@element-plus/icons-vue';
 import { User } from '@/types/user';
@@ -64,7 +73,7 @@ let columns = ref([
     { prop: 'carId', label: '车次' },
     { prop: 'planTime', label: '计划时间' },
     { prop: 'opreateTime', label: '操作时间' },
-    { prop: "operator", label: "操作", width: 250 },
+    { prop: "operator3", label: "操作", width: 250 },
 ]);
 const page = reactive({
     index: 1,
@@ -72,6 +81,14 @@ const page = reactive({
     total: 0,
 });
 const tableData = ref([]);
+
+const paginatedTableData = computed(() => {
+    console.log("paginatedTableData",tableData.value.length)
+    const start = (page.index - 1) * page.size;
+    const end = start + page.size;
+    return tableData.value.slice(start, end);
+});
+
 const getData = async () => {
     try {
         const res = await fetchLogData();
@@ -85,8 +102,8 @@ const getData = async () => {
 getData();
 
 const changePage = (val: number) => {
+    console.log("changePage",val)
     page.index = val;
-    getData();
 };
 
 // 新增/编辑弹窗相关
@@ -150,6 +167,19 @@ const closeDialog = () => {
 // 删除相关
 const handleDelete = async (row: any) => {
     try {
+        // 获取当前时间
+        const now = new Date();
+        // 计算半个月前的时间
+        const halfMonthAgo = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000);
+        // 将 opreateTime 转换为 Date 对象
+        const opreateTime = new Date(row.opreateTime);
+        console.log("halfMonthAgo",halfMonthAgo > halfMonthAgo)
+        console.log("now",opreateTime)
+        // 判断 opreateTime 是否在最近半个月内
+        if (opreateTime >= halfMonthAgo && opreateTime <= now) {
+            ElMessage.warning('近半个月数据不可操作');
+            return;
+        }
 
         // 调用删除 API 
         const person = String(row.id);
@@ -166,6 +196,25 @@ const handleDelete = async (row: any) => {
         }
     }
 };
+// const handleDelete = async (row: any) => {
+//     try {
+
+
+//         // 调用删除 API 
+//         const person = String(row.id);
+//         await DeleteLogInfo(person);
+        
+//         ElMessage.success('日志删除成功');
+        
+//         // 重新获取数据
+//         await getData();
+//     } catch (error) {
+//         if (error !== 'cancel') { // 过滤用户取消操作
+//             ElMessage.error('日志删除失败');
+//             console.error('删除失败:', error);
+//         }
+//     }
+// };
 </script>
 
 <style scoped></style>

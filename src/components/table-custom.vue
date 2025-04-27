@@ -40,7 +40,7 @@
                 <slot name="info"></slot>
             </div>
         <el-table class="mgb20" :style="{ width: '100%' }" border :data="tableData" :row-key="rowKey"
-            @selection-change="handleSelectionChange" table-layout="auto">
+            @selection-change="handleSelectionChange" table-layout="auto" :row-style="getRowStyle">
             <template v-for="item in columns" :key="item.prop">
                 <el-table-column v-if="item.visible" :prop="item.prop" :label="item.label" :width="item.width"
                     :type="item.type" :align="item.align || 'center'">
@@ -59,6 +59,22 @@
                                     删除
                                 </el-button>
                             </template>
+                            <template v-if="item.prop === 'operator2'">
+                                <el-button type="primary" size="small" :icon="UploadFilled" @click="downloadExcel(row)">
+                                    导出excel
+                                </el-button>
+                                <el-button type="success" size="small" :icon="Share" @click="previewExcel(row)">
+                                    excel预览
+                                </el-button>
+                                <el-button type="danger" size="small" :icon="Delete" @click="handleDelete(row)">
+                                    删除
+                                </el-button>
+                            </template>
+                            <template v-if="item.prop === 'operator3'">
+                                <el-button type="danger" size="small" :icon="Delete" @click="handleDelete(row)">
+                                    删除
+                                </el-button>
+                                    </template>
                             <span v-else-if="item.formatter">
                                 {{ item.formatter(row[item.prop]) }}
                             </span>
@@ -66,18 +82,17 @@
                                 <template v-for="opreate in row.opreate" :key="opreate.opration">➫
                                     <el-button 
                                     style="margin-left: 5px;margin-right: 5px;" 
-                                    :type="opreate.isOk === 0 ? 'danger' : opreate.isOk === 1 ? 'success' : opreate.isOk === 2 ? 'primary' : opreate.isOk === 3 ? 'warning' : 'info'" 
+                                    :type="opreate.isOk === 0 ? 'danger' 
+                                    : opreate.isOk === 1 ? 'success' 
+                                    : opreate.isOk === 2 ? 'primary' 
+                                    : opreate.isOk === 3 ? 'warning' 
+                                    : 'info'" 
                                     size="small"
                                     @click="handleOpreate({row,opreate,})">
                                         {{ opreate.opration }}
                                     </el-button>
                                     
                                 </template>
-                               <!-- {{row.opreate?row.opreate.map((item2,index2)=>{
-                                return '->'+item2.opration
-}
-):'' }} -->
-
                             </template>
                             <span v-else>
                                 {{ row[item.prop] }}
@@ -87,15 +102,25 @@
                 </el-table-column>
             </template>
         </el-table>
-        <el-pagination v-if="hasPagination" :current-page="currentPage" :page-size="pageSize" :background="true"
+        <el-pagination v-if="hasPagination"  :background="true"
             :layout="layout" :total="total" @current-change="handleCurrentChange" />
+            <el-dialog v-model="previewVisible" title="导入预览" width="80%" @close="closePreview">
+            <div>
+                <el-table :data="previewData" border style="width: 100%">
+                    <el-table-column v-for="(column, index) in previewColumns" :key="index" :prop="column.prop" :label="column.label" />
+                </el-table>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { toRefs, PropType, ref } from 'vue'
-import { Delete, Edit, View, Refresh } from '@element-plus/icons-vue';
-import { ElMessageBox } from 'element-plus';
+import { Delete, Edit, View, Refresh, Share, UploadFilled } from '@element-plus/icons-vue';
+import { ElMessageBox, ElMessage } from 'element-plus';
+import * as XLSX from 'xlsx';
+import axios from 'axios';
+import { useRoute } from 'vue-router';
 
 const props = defineProps({
     // 表格相关
@@ -197,9 +222,28 @@ const handleSelectionChange = (selection: any[]) => {
 
 // 当前页码变化的事件
 const handleCurrentChange = (val: number) => {
-    props.changePage(val)
-}
+    // console.log('handleCurrentChange 方法被调用，新的页码：', val);
+    const changePageFunc = props.changePage;
+    if (typeof changePageFunc === 'function') {
+        changePageFunc(val);
+    } else {
+        console.error('changePage 不是一个函数');
+    }
+};
 
+const downloadExcel = (row) => {
+    if(row.value === "无对应文件"){
+        ElMessageBox.alert('无对应文件,不可下载', '提示', {
+            type: 'warning'
+        })
+            .then(() => { })
+    }else{
+        const url = 'https://pic-excel.oss-cn-hangzhou.aliyuncs.com/excel/'+row.value;
+    console.log(url);
+    window.open(url);  
+}
+     
+};
 const handleDelete = (row) => {
     ElMessageBox.confirm('确定要删除吗？', '提示', {
         type: 'warning'
@@ -233,6 +277,76 @@ const getIndex = (index: number) => {
     return index + 1 + (currentPage.value - 1) * pageSize.value
 }
 
+const previewVisible = ref(false);
+const previewData = ref([]);
+const previewColumns = ref([]);
+
+const previewExcel = async (row: any) => {
+    if (row.value === "无对应文件") {
+        ElMessage.error("没有文件可以预览");
+        return;
+    }
+    const fileUrl = `https://pic-excel.oss-cn-hangzhou.aliyuncs.com/excel/${row.value}`;
+    try {
+        console.log('开始执行预览操作');
+        const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
+        console.log('成功获取文件响应', response);
+        const data = new Uint8Array(response.data);
+        const workbook = XLSX.read(data, { type: "array" });
+        if (!workbook.SheetNames.length) throw new Error("无有效工作表");
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const headerData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[];
+        const headers = headerData[0] || [];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
+        previewData.value = jsonData;
+        previewColumns.value = headers.map((header: string) => ({
+            prop: header,
+            label: header,
+        }));
+        previewVisible.value = true;
+        console.log('预览窗口应已打开');
+    } catch (error) {
+        console.error("预览错误：", error);
+        ElMessage.error("预览失败，请检查文件格式（仅支持.xlsx/.xls）或网络连接");
+        previewVisible.value = false;
+    }
+};
+
+const route = useRoute();
+const getRowStyle = ({ row, rowIndex }) => {
+    // 假设目标页面的路由路径是 /target-page
+    if (route.path === '/dashboard') {
+        const currentTime = new Date("2025-03-26 17:20:00");
+        // const currentTime = new Date();
+       const arrtime = new Date(row.arrTime)
+       const outtime = new Date(row.outTime)
+       const timeDifference = (arrtime.getTime() - currentTime.getTime()) / (1000 * 60); 
+       const timeDifference1 = (outtime.getTime() - currentTime.getTime()) / (1000 * 60); 
+       console.log(timeDifference1)
+       if (timeDifference < 0) {
+        return { backgroundColor: 'gray' };
+    } else if (timeDifference <= 30) {
+        return { backgroundColor: 'lawnGreen' };
+    } 
+    else if (timeDifference1 <= 30) {
+        return { backgroundColor: 'red' };
+    }else {
+        return {  };
+    }
+        // if (row.arrTime === "2025-03-26 17:38:00") {
+        //     return { backgroundColor: 'gray' };
+        // } else {
+        //     return { backgroundColor: '#ffffff' };
+        // }
+    }
+    return {};
+};
+
+const closePreview = () => {
+    previewVisible.value = false;
+    previewData.value = [];
+    previewColumns.value = [];
+};
 </script>
 
 <style scoped>

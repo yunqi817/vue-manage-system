@@ -59,6 +59,7 @@ const getData = async () => {
     try {
         const res = await fetchjobData();
         tableData.value = res.data;
+        console.log(res.data)
         page.total = res.data.length;
         // console.log("111111111111222222222",res.data.length)
     } catch (error) {
